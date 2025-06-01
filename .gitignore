@@ -1,0 +1,16 @@
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Ansible
+*.retry
+
+# SSH Keys / Secrets
+*.pem
+terraform.tfvars
+
+# Editor stuff
+.vscode/
+.idea/
+.DS_Store
