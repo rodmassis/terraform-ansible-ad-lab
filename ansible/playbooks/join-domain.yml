@@ -1,0 +1,54 @@
+---
+- name: Join Linux server to AD Domain
+  hosts: linux_ad
+  become: true
+  vars:
+    domain_name: "lab.local"
+    ad_user: "Administrator"
+    ad_password: "P@ssw0rd123!"
+  tasks:
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - realmd
+          - sssd
+          - oddjob
+          - oddjob-mkhomedir
+          - adcli
+          - samba-common
+          - samba-common-tools
+          - krb5-workstation
+          - sssd-tools
+          - packagekit
+        state: present
+
+    - name: Ensure system is using AD DNS
+      lineinfile:
+        path: /etc/resolv.conf
+        line: "nameserver {{ hostvars['windows_ad'].ansible_host }}"
+        create: yes
+        state: present
+      when: "'windows_ad' in groups"
+
+    - name: Discover the AD domain
+      command: realm discover {{ domain_name }}
+      register: realm_discover
+      changed_when: false
+
+    - name: Join the Linux instance to the domain
+      command: >
+        realm join --user={{ ad_user }}
+        {{ domain_name }}
+      args:
+        stdin: "{{ ad_password }}"
+      register: realm_join
+      changed_when: "'successfully enrolled' in realm_join.stdout"
+
+    - name: Ensure SSSD service is started
+      service:
+        name: sssd
+        state: started
+        enabled: yes
+
+    - name: Allow domain users to log in
+      command: realm permit --all

@@ -1,0 +1,4 @@
+---
+- import_playbook: playbooks/promote-ad.yml
+- import_playbook: playbooks/join-linux-domain.yml
+- import_playbook: playbooks/validate-domain.yml

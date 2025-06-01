@@ -1,0 +1,42 @@
+---
+- name: Validate Domain Controller status (Windows)
+  hosts: windows_ad
+  gather_facts: false
+  tasks:
+    - name: Check if the server is a Domain Controller
+      win_shell: |
+        (Get-WmiObject Win32_ComputerSystem).DomainRole
+      register: dc_role
+
+    - name: Print DC Role
+      debug:
+        msg: "Domain Role Code: {{ dc_role.stdout }} (5 = Primary DC)"
+
+    - name: Check DNS service status
+      win_service:
+        name: DNS
+      register: dns_service
+
+    - name: Print DNS service state
+      debug:
+        msg: "DNS Service status: {{ dns_service.status }}"
+
+- name: Validate Linux domain join status
+  hosts: linux_ad
+  become: true
+  tasks:
+    - name: Check if realm list shows domain
+      command: realm list
+      register: realm_list
+
+    - name: Show realm list output
+      debug:
+        var: realm_list.stdout
+
+    - name: Check SSSD service status
+      service_facts:
+
+    - name: Print SSSD status
+      debug:
+        var: ansible_facts.services["sssd.service"]
+      when: "'sssd.service' in ansible_facts.services"

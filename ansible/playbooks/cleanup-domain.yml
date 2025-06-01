@@ -1,0 +1,40 @@
+---
+- name: Leave AD domain and reset Linux
+  hosts: linux_ad
+  become: true
+  tasks:
+    - name: Leave the AD domain
+      command: realm leave -v
+      ignore_errors: yes
+
+    - name: Stop and disable SSSD
+      service:
+        name: sssd
+        enabled: no
+        state: stopped
+
+    - name: Remove SSSD config files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/sssd/sssd.conf
+        - /etc/krb5.keytab
+
+    - name: Clear hostname
+      hostname:
+        name: localhost.localdomain
+
+- name: Demote Domain Controller (Windows)
+  hosts: windows_ad
+  gather_facts: false
+  tasks:
+    - name: Remove AD DS role (unsafe to run in production!)
+      win_shell: |
+        Uninstall-ADDSDomainController -DemoteOperationMasterRole -ForceRemoval -RemoveApplicationPartitions -LocalAdministratorPassword (ConvertTo-SecureString -String 'Admin123!' -AsPlainText -Force) -Force
+      ignore_errors: yes
+
+    - name: Reboot after demotion
+      win_reboot:
+        reboot_timeout: 600
+      when: not ansible_check_mode
