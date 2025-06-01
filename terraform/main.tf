@@ -36,3 +36,34 @@ module "windows_server" {
   vpc_id        = module.network.vpc_id
   vpc_cidr = var.vpc_cidr
 }
+
+output "linux_private_ip" {
+  value = module.linux_server.private_ip
+}
+
+output "windows_private_ip" {
+  value = module.windows_server.private_ip
+}
+
+resource "local_file" "ansible_inventory" {
+  filename = "${path.module}/ansible/inventory/hosts.ini"
+  content  = <<-EOT
+[linux]
+${module.linux_server.private_ip}
+
+[windows]
+${module.windows_server.private_ip}
+EOT
+}
+
+# resource "null_resource" "generate_ansible_inventory" {
+#   provisioner "local-exec" {
+#     command = <<EOT
+#       echo "[windows]" > ansible/inventory/hosts.ini
+#       echo "${module.windows_server.private_ip}" >> ansible/inventory/hosts.ini
+#       echo "\n[linux]" >> ansible/inventory/hosts.ini
+#       echo "${module.linux_server.private_ip}" >> ansible/inventory/hosts.ini
+#     EOT
+#   }
+#   depends_on = [module.linux_server, module.windows_server]
+# }
