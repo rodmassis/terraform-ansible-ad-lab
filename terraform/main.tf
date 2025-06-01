@@ -3,6 +3,21 @@
 provider "aws" {
   region = var.aws_region
 }
+resource "tls_private_key" "infra_lab" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "infra_lab" {
+  key_name   = var.key_name
+  public_key = tls_private_key.infra_lab.public_key_openssh
+}
+
+resource "local_file" "private_key_pem" {
+  content              = tls_private_key.infra_lab.private_key_pem
+  filename             = "${path.module}/infra-lab-key.pem"
+  file_permission      = "0400"
+}
 
 module "network" {
   source = "./modules/network"

@@ -14,3 +14,4 @@ terraform.tfvars
 .vscode/
 .idea/
 .DS_Store
+infra-lab-key.pem
