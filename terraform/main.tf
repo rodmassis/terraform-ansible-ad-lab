@@ -37,14 +37,6 @@ module "windows_server" {
   vpc_cidr = var.vpc_cidr
 }
 
-output "linux_private_ip" {
-  value = module.linux_server.private_ip
-}
-
-output "windows_private_ip" {
-  value = module.windows_server.private_ip
-}
-
 resource "local_file" "ansible_inventory" {
   filename = "${path.module}/ansible/inventory/hosts.ini"
   content  = <<-EOT
@@ -54,6 +46,36 @@ ${module.linux_server.private_ip}
 [windows]
 ${module.windows_server.private_ip}
 EOT
+}
+
+output "linux_public_ip" {
+  description = "Public IP of the Linux server"
+  value       = module.linux_server.public_ip
+}
+
+output "linux_private_ip" {
+  description = "Private IP of the Linux server"
+  value       = module.linux_server.private_ip
+}
+
+output "linux_instance_id" {
+  description = "EC2 Instance ID of the Linux server"
+  value       = module.linux_server.instance_id
+}
+
+output "windows_public_ip" {
+  description = "Public IP of the Windows (AD) server"
+  value       = module.windows_server.public_ip
+}
+
+output "windows_private_ip" {
+  description = "Private IP of the Windows (AD) server"
+  value       = module.windows_server.private_ip
+}
+
+output "windows_instance_id" {
+  description = "EC2 Instance ID of the Windows (AD) server"
+  value       = module.windows_server.instance_id
 }
 
 # resource "null_resource" "generate_ansible_inventory" {
