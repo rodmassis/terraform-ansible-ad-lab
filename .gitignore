@@ -6,6 +6,8 @@
 # Ansible
 *.retry
 windows_password.txt
+hosts.ini
+hosts.ini.bkp
 
 # SSH Keys / Secrets
 *.pem
