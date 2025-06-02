@@ -1,6 +1,6 @@
 # Terraform + Ansible Active Directory Lab
 
-This lab automates the provisioning and configuration of a hybrid environment using **Terraform** and **Ansible**. It deploys a **Windows Server** (promoted to Domain Controller with Active Directory) and a **Linux server** (domain-joined client) on AWS — great for DevOps interviews, demonstrations, and practice.
+This lab automates the provisioning and configuration of a hybrid environment using **Terraform** and **Ansible**. It deploys a **Windows Server** (promoted to Domain Controller with Active Directory) and a **Linux server** (domain-joined client) on AWS — great for DevOps POCs, demonstrations, and practice.
 
 ---
 
@@ -93,7 +93,7 @@ terraform destroy
 
 - Realistic Active Directory automation
 - Full hybrid environment simulation
-- Interview-ready DevOps/IaC use case
+- POC-ready DevOps/IaC use case
 - Expandable with Ansible Tower, GitLab CI, or web UIs
 
 ---
