@@ -1,4 +1,4 @@
-# Terraform + Ansible Active Directory Lab
+# Terraform + Ansible + Active Directory Lab
 
 This lab automates the provisioning and configuration of a hybrid environment using **Terraform** and **Ansible**. It deploys a **Windows Server** (promoted to Domain Controller with Active Directory) and a **Linux server** (domain-joined client) on AWS — great for DevOps POCs, demonstrations, and practice.
 
