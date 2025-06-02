@@ -22,7 +22,7 @@
         msg: "DNS Service status: {{ dns_service.status }}"
 
 - name: Validate Linux domain join status
-  hosts: linux_ad
+  hosts: linux
   become: true
   tasks:
     - name: Check if realm list shows domain

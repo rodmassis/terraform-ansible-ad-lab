@@ -1,6 +1,6 @@
 ---
 - name: Join Linux server to AD Domain
-  hosts: linux_ad
+  hosts: linux
   become: true
   vars:
     domain_name: "lab.local"
