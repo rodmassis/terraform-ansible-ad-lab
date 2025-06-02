@@ -5,30 +5,27 @@
   vars:
     domain_name: "lab.local"
     ad_user: "Administrator"
-    ad_password: "P@ssw0rd123!"
+    ad_password: "c-9FXsck3UI3*46JNM(xJqph.C6.N9TD"
   tasks:
     - name: Install required packages
-      ansible.builtin.package:
-        name:
+      package:
+        name: "{{ common_packages }}"
+      vars:
+        common_packages:
           - realmd
-          - sssd
           - oddjob
           - oddjob-mkhomedir
+          - sssd
           - adcli
-          - samba-common
           - samba-common-tools
-          - krb5-workstation
-          - sssd-tools
-          - packagekit
-        state: present
-
+      when: ansible_distribution == 'Amazon'
+      
     - name: Ensure system is using AD DNS
+      become: yes
       lineinfile:
         path: /etc/resolv.conf
-        line: "nameserver {{ hostvars['windows'].ansible_host }}"
-        create: yes
-        state: present
-      when: "'windows' in groups"
+        regexp: '^nameserver'
+        line: "nameserver {{ windows_dns }}"
 
     - name: Discover the AD domain
       command: realm discover {{ domain_name }}

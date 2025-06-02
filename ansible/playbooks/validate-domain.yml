@@ -19,7 +19,7 @@
 
     - name: Print DNS service state
       debug:
-        msg: "DNS Service status: {{ dns_service.status }}"
+        msg: "DNS Service status: {{ dns_service.state }}"
 
 - name: Validate Linux domain join status
   hosts: linux
