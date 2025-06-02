@@ -1,0 +1,4 @@
+domain_name: lab.local
+domain_netbios: LAB
+domain_admin_user: Administrator
+domain_admin_password: "{{ lookup('env', 'WINDOWS_DOMAIN_PASSWORD') }}"
