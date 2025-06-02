@@ -5,6 +5,7 @@
 
 # Ansible
 *.retry
+windows_password.txt
 
 # SSH Keys / Secrets
 *.pem

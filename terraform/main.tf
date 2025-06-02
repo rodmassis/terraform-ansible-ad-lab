@@ -93,6 +93,25 @@ output "windows_instance_id" {
   value       = module.windows_server.instance_id
 }
 
+resource "null_resource" "ssh_key_setup" {
+  provisioner "local-exec" {
+    command = <<EOT
+mkdir -p ~/.ssh
+cp ${path.module}/ssh/infra-lab-key.pem ~/.ssh/infra-lab-key
+chmod 600 ~/.ssh/infra-lab-key
+echo "🔐 Key copied to ~/.ssh/infra-lab-key"
+
+# Optional: Add to agent
+if command -v ssh-agent > /dev/null && [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent -s)"
+fi
+ssh-add ~/.ssh/infra-lab-key || echo "⚠️ Could not add key to agent (maybe agent not running?)"
+EOT
+  }
+
+  depends_on = [local_file.private_key_pem]
+}
+
 resource "null_resource" "get_windows_password" {
   provisioner "local-exec" {
     command = <<EOT
@@ -118,23 +137,4 @@ EOT
   }
 
   depends_on = [module.windows_server]
-}
-
-resource "null_resource" "ssh_key_agent_setup" {
-  provisioner "local-exec" {
-    command = <<EOT
-mkdir -p ~/.ssh
-cp ./ssh/infra-lab-key.pem ~/.ssh/infra-lab-key
-chmod 600 ~/.ssh/infra-lab-key
-
-# Add to SSH agent
-eval "$(ssh-agent -s)" >/dev/null
-ssh-add ~/.ssh/infra-lab-key
-echo "🔐 SSH key added to agent successfully."
-EOT
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
 }
