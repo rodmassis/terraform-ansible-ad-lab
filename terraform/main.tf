@@ -15,7 +15,7 @@ resource "aws_key_pair" "infra_lab" {
 
 resource "local_file" "private_key_pem" {
   content              = tls_private_key.infra_lab.private_key_pem
-  filename             = "${path.module}/infra-lab-key.pem"
+  filename             = "${path.module}/ssh/infra-lab-key.pem"
   file_permission      = "0400"
 }
 
@@ -56,10 +56,10 @@ resource "local_file" "ansible_inventory" {
   filename = "${path.module}/ansible/inventory/hosts.ini"
   content  = <<-EOT
 [linux]
-${module.linux_server.private_ip}
+${module.linux_server.public_ip}
 
 [windows]
-${module.windows_server.private_ip}
+${module.windows_server.public_ip}
 EOT
 }
 
@@ -93,14 +93,48 @@ output "windows_instance_id" {
   value       = module.windows_server.instance_id
 }
 
-# resource "null_resource" "generate_ansible_inventory" {
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       echo "[windows]" > ansible/inventory/hosts.ini
-#       echo "${module.windows_server.private_ip}" >> ansible/inventory/hosts.ini
-#       echo "\n[linux]" >> ansible/inventory/hosts.ini
-#       echo "${module.linux_server.private_ip}" >> ansible/inventory/hosts.ini
-#     EOT
-#   }
-#   depends_on = [module.linux_server, module.windows_server]
-# }
+resource "null_resource" "get_windows_password" {
+  provisioner "local-exec" {
+    command = <<EOT
+echo "🔐 Fetching Windows Administrator password..."
+aws ec2 get-password-data \
+  --instance-id ${module.windows_server.instance_id} \
+  --priv-launch-key ~/.ssh/infra-lab-key.pem \
+  --region ${var.aws_region} \
+  --query PasswordData \
+  --output text > ansible/windows_password.txt
+
+if [ -s ansible/windows_password.txt ]; then
+  echo "✅ Windows password stored in ansible/windows_password.txt"
+  echo "🔑 Password: $(cat ansible/windows_password.txt)"
+else
+  echo "❌ Password not yet available — try again after a few minutes"
+fi
+EOT
+  }
+
+  triggers = {
+    instance_id = module.windows_server.instance_id
+  }
+
+  depends_on = [module.windows_server]
+}
+
+resource "null_resource" "ssh_key_agent_setup" {
+  provisioner "local-exec" {
+    command = <<EOT
+mkdir -p ~/.ssh
+cp ./ssh/infra-lab-key.pem ~/.ssh/infra-lab-key
+chmod 600 ~/.ssh/infra-lab-key
+
+# Add to SSH agent
+eval "$(ssh-agent -s)" >/dev/null
+ssh-add ~/.ssh/infra-lab-key
+echo "🔐 SSH key added to agent successfully."
+EOT
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
