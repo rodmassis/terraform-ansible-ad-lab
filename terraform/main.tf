@@ -53,7 +53,7 @@ module "windows_server" {
 }
 
 resource "local_file" "ansible_inventory" {
-  filename = "${path.module}/ansible/inventory/hosts.ini"
+  filename = "../ansible/inventory/hosts.ini"
   content  = <<-EOT
 [linux]
 ${module.linux_server.public_ip}
@@ -121,7 +121,7 @@ aws ec2 get-password-data \
   --priv-launch-key ~/.ssh/infra-lab-key.pem \
   --region ${var.aws_region} \
   --query PasswordData \
-  --output text > ansible/windows_password.txt
+  --output text > ../ansible/windows_password.txt
 
 if [ -s ansible/windows_password.txt ]; then
   echo "✅ Windows password stored in ansible/windows_password.txt"
