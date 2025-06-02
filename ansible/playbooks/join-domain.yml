@@ -5,7 +5,7 @@
   vars:
     domain_name: "lab.local"
     ad_user: "Administrator"
-    ad_password: "c-9FXsck3UI3*46JNM(xJqph.C6.N9TD"
+    ad_password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   tasks:
     - name: Install required packages
       package:
