@@ -1,6 +1,6 @@
 ---
 - name: Promote Windows Server to Domain Controller
-  hosts: windows_ad
+  hosts: windows
   gather_facts: no
   vars:
     domain_name: "lab.local"

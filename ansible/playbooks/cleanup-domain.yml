@@ -26,7 +26,7 @@
         name: localhost.localdomain
 
 - name: Demote Domain Controller (Windows)
-  hosts: windows_ad
+  hosts: windows
   gather_facts: false
   tasks:
     - name: Remove AD DS role (unsafe to run in production!)

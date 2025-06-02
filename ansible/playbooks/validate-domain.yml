@@ -1,6 +1,6 @@
 ---
 - name: Validate Domain Controller status (Windows)
-  hosts: windows_ad
+  hosts: windows
   gather_facts: false
   tasks:
     - name: Check if the server is a Domain Controller

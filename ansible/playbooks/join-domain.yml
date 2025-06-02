@@ -25,10 +25,10 @@
     - name: Ensure system is using AD DNS
       lineinfile:
         path: /etc/resolv.conf
-        line: "nameserver {{ hostvars['windows_ad'].ansible_host }}"
+        line: "nameserver {{ hostvars['windows'].ansible_host }}"
         create: yes
         state: present
-      when: "'windows_ad' in groups"
+      when: "'windows' in groups"
 
     - name: Discover the AD domain
       command: realm discover {{ domain_name }}
